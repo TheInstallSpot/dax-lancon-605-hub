@@ -876,7 +876,7 @@ const TOPICS = [
       { warn: 'Brakes are safety-critical. After ANY brake work, pump the pedal until it\'s firm and confirm the kart actually stops at walking pace before you go on track. Never mix brake-fluid types.' },
 
       { h: '1 · Bleeding' },
-      { p: 'Bleed at season start, any time the pedal feels spongy or long, and whenever you change pads or the disc (pushing the pistons back lets air in). Use the DOT fluid your system specifies — commonly <b>DOT 4</b> — from a fresh sealed bottle. Never reuse old fluid and never add DOT 5 silicone.' },
+      { p: 'Bleed at season start, any time the pedal feels spongy or long, and whenever you change pads or the disc (pushing the pistons back lets air in). Use the DOT fluid your system specifies — commonly <b>DOT 4</b> — from a fresh sealed bottle. Never reuse old fluid, and never mix fluid types — don\'t switch to a different type (e.g. DOT 5 silicone) unless your system is rated for it.' },
       { p: '<b>Reverse (push-up) bleed — the reliable kart method.</b> Air rises toward the master cylinder, so pushing fresh fluid UP from the caliper clears it best:' },
       { steps: [
         'Clean around the caliper bleed screw and the reservoir so no grit gets in.',
@@ -935,7 +935,7 @@ const TOPICS = [
     sections: [
       { p: 'The MyChron 6 is our dash logger and GPS lap timer. On the <b>1T</b> it records engine <b>RPM</b>, one <b>temperature</b> (cylinder-head temp), and <b>25 Hz GPS</b> speed/position, plus lap and split times. In the moment it shows your shift lights, temp, and a predictive lap; afterward you download it and find where the lap time is actually hiding.' },
       { diagram: 'mychron' },
-      { note: 'Quick specs: 320×136 color display, internal rechargeable battery + USB-C, 25 Hz GPS, Wi-Fi (to ~50 m) + Bluetooth, 4 GB memory, 5 RGB shift LEDs, 2 alarm LEDs, IP67. Configure and download with the AiM RS3 app (iOS/Android) or RaceStudio 3 on a PC.' },
+      { note: 'Quick specs: 320×136 color display, internal rechargeable battery + USB-C, 25 Hz GPS, Wi-Fi + Bluetooth, 4 GB memory, 5 RGB shift LEDs, 2 alarm LEDs, IP67. Configure and download with the AiM RS3 app (iOS/Android) or RaceStudio 3 on a PC.' },
 
       /* ---------- INSTALL ---------- */
       { h: 'Installing it' },
@@ -954,7 +954,7 @@ const TOPICS = [
         'Confirm RPM reads sanely — a few thousand at idle-ish, climbing to ~6,000+ at speed. If it\'s wild or reads double, re-do the plug-wire wrap.',
         'Set the shift LEDs to your useful RPM band and set a CHT over-temp alarm so a hot engine flags on the dash.',
         'Track & lap timing: the GPS auto-recognizes the circuit and times laps automatically — no beacon needed (you can still add an optical/magnetic beacon if a track needs it). Just make sure it has GPS lock before the session.',
-        'Pair the RS3 app over Wi-Fi/Bluetooth to tweak pages, alarms, and shift points from your phone.'
+        'Pair the RS3 app over Wi-Fi to tweak pages, alarms, and shift points from your phone.'
       ]},
 
       /* ---------- USING THE DATA ---------- */
@@ -978,9 +978,9 @@ const TOPICS = [
     title: 'Race Studio 3 — Desktop',
     tag: 'Data · Software',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 11l3-3 3 3 4-5"/></svg>',
-    summary: 'Connect the MyChron, download sessions, manage tracks, and analyze in Race Studio Analysis 3.',
+    summary: 'Connect the MyChron, download sessions, manage tracks, and analyze in the Analysis section.',
     sections: [
-      { p: 'Race Studio 3 (RS3) is AiM\'s free PC/Mac software: it manages the MyChron, downloads your sessions and video, configures the device, handles track maps, and opens the deep analysis tool — <b>Race Studio Analysis 3 (RS3A)</b>. This is where you actually pull the lap time apart after a session.' },
+      { p: 'Race Studio 3 (RS3) is AiM\'s free <b>Windows</b> software (on a Mac it runs only via a workaround like CrossOver): it manages the MyChron, downloads your sessions and video, configures the device, handles track maps, and opens its deep <b>Analysis</b> section. This is where you actually pull the lap time apart after a session.' },
       { diagram: 'rs3flow' },
       { note: 'Download RS3 free from aim-sportline.com / aimtechnologies.com. Sessions save as <b>.xrk</b> files and land in the analysis database automatically after download.' },
 
@@ -999,7 +999,7 @@ const TOPICS = [
       { steps: [
         'Open the Devices section (left sidebar) and select the MyChron.',
         'Choose Data Download to see the sessions on the logger.',
-        'Download them — with "Use RaceStudio 3 Analysis" enabled they drop straight into the RS3A database, sorted by date, track, and driver.'
+        'Download them — with "Use RaceStudio 3 Analysis" enabled they drop straight into the Analysis database, sorted by date, track, and driver.'
       ]},
 
       { h: '3 · Tracks & lap timing' },
@@ -1013,9 +1013,9 @@ const TOPICS = [
       { h: '4 · Configure the MyChron (optional)' },
       { p: 'Configurations → New (or Clone an existing one) → set channels, display pages, shift-light RPM, and alarms → Transmit to the device. Clone your known-good config so every kart on the team runs the same setup.' },
 
-      { h: '5 · Analyze it (Race Studio Analysis 3)' },
+      { h: '5 · Analyze it (the Analysis section)' },
       { steps: [
-        'Click the RS3A icon (top-left) to open analysis; the database lists your sessions — double-click one to open it.',
+        'Click the Analysis icon (top-left) to open it; the database lists your sessions — double-click one to open it.',
         'Pick laps: the best lap is flagged by default. Use the Laps dropdown to choose which laps to show; right-click a lap to "Generate predictive reference lap from this lap".',
         'Use the views from the toolbar: Time/Distance graph (speed, RPM, temp traces), Track Map (colored by speed/split), Split Times report (sector times vs best), plus Channels report, Histogram, and Scatter.'
       ]},
@@ -1039,7 +1039,7 @@ const TOPICS = [
     summary: 'Download, analyze, and manage the MyChron right from your phone at the track — no laptop.',
     sections: [
       { p: 'The <b>RaceStudio 3</b> app (free, App Store, iOS 18+, the new 3.0 release) puts the core of RS3 on your iPhone, so you can download and check data right at the grid without dragging out a laptop. It\'s the fast trackside companion to the desktop software.' },
-      { note: 'It\'s a companion, not a full replacement — for deep multi-lap analysis and video sync you\'ll still want desktop RS3A. But for a quick between-sessions read, the app covers it.' },
+      { note: 'It\'s a companion, not a full replacement — for deep multi-lap analysis and video sync you\'ll still want desktop Race Studio 3. But for a quick between-sessions read, the app covers it.' },
 
       { h: 'Get set up' },
       { steps: [
@@ -1085,14 +1085,14 @@ const TOPICS = [
       { h: 'Baseline settings' },
       { list: [
         'Idle mixture screw: gently seat it (all the way in), then back out 1.5–2 turns as a starting point. Out = richer, in = leaner.',
-        'Float height: a common target is about .860"–.870" — always confirm against your class rulebook.',
+        'Float height: the Briggs spec is .860" (22.0 mm); adjust it only by bending the float tab, and always confirm against your class rulebook.',
         'Idle speed: set so the engine idles without loading the clutch, after the mixture is close.'
       ]},
       { h: 'Symptom → fix' },
       { table: { head: ['Symptom', 'Try'], rows: [
-        ['Popping on deceleration', 'Check header/exhaust gasket for a leak, richen the needle clip, verify float height'],
+        ['Popping on deceleration', 'Check header/exhaust gasket for a leak; if lean, richen part-throttle (C-clip DOWN one notch = needle up); verify float height'],
         ['Surging / hunting idle', 'Clean the pilot jet, back the mixture screw out slightly, inspect the intake boot for cracks'],
-        ['Bogs coming off the corner', 'Lower float height a touch, raise the needle clip'],
+        ['Bogs coming off the corner (lean bog)', 'Richen part-throttle: move the C-clip DOWN one notch (needle up = richer); check for an intake air leak and a clean pilot jet'],
         ['Fuel weeping at rest', 'Worn needle/seat — rebuild with a fresh kit']
       ]}},
       { warn: 'Every class polices the carb differently and parts are often sealed or spec. Confirm any change is legal for your class before you touch it — an illegal carb mod is an easy DQ.' },
@@ -1108,7 +1108,7 @@ const TOPICS = [
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="12" r="4"/><circle cx="18" cy="12" r="2"/><path d="M7 8v8M18 10v4"/></svg>',
     summary: 'Tension, alignment, lube, and quick-change gearing basics.',
     sections: [
-      { p: 'Gearing (the driver/driven sprocket combo) is your biggest lap-time lever race to race. Getting the chain itself right keeps that power getting to the ground and keeps you from throwing a chain mid-race.' },
+      { p: 'Gearing (the driver/driven sprocket combo) is your biggest lap-time lever race to race. The LO206 runs a <b>#35</b> chain. Getting the chain itself right keeps that power getting to the ground and keeps you from throwing a chain mid-race.' },
       { h: 'The essentials' },
       { list: [
         'Tension: aim for a small amount of free play — roughly 1/4" of up-and-down movement at the middle of the top run. Too tight robs power and wears bearings; too loose throws chains.',
@@ -1159,12 +1159,12 @@ const TOPICS = [
       { p: 'Two knobs: <b>springs</b> (engagement RPM) and <b>shoe weights</b> (engagement + torque). On the LO206 you want the clutch to engage near the bottom of the engine\'s useful power so it drives hard off the corner without bogging or slipping.' },
       { list: [
         '<b>Springs:</b> stiffer/more springs = higher engagement RPM; softer/fewer = lower. Long straights & fast tracks like a higher engagement to launch harder off slow corners; tight tracks like a bit lower for smoother pickup.',
-        '<b>Weights:</b> more weight per shoe = lower engagement (≈ 100–200 rpm lower per weight) AND more torque capacity/less slip; less weight = higher engagement, more slip on slick tracks.',
+        '<b>Weights:</b> more weight per shoe = lower engagement (a modest drop per weight — tens of rpm, not hundreds) AND more torque capacity/less slip; less weight = higher engagement, more slip on slick tracks.',
         '<b>Balance:</b> if you change one shoe\'s weight, the shoe 180° opposite MUST match — keep it balanced.',
         '<b>Shoe orientation:</b> leading (mass ahead of the lug) self-energizes — more aggressive, less slip; trailing (mass behind) slips more, softer pickup; an X-pattern (2 leading + 2 trailing) splits the difference.',
         '<b>Verify on data:</b> watch engagement RPM on the MyChron — it should engage at the same RPM every lap.'
       ]},
-      { tip: 'Hilliard\'s recommended starting point for most racers: shoes in the leading orientation with 2 black + 2 white springs — engages around 3400 rpm. Tune from there.' },
+      { tip: 'A common US LO206 starting point is 2 black + 2 white springs, which lands roughly in the mid-3000s rpm (an estimate — it sits between the single-spring black 3800 and white 2800). Orientation is a tuning choice: leading launches more aggressively, trailing is smoother — Hilliard\'s own testing has favored trailing. Tune from there.' },
       { warn: 'Check your class rules before tuning — many LO206 classes limit clutch springs/weights or require the spec setup. Don\'t tune yourself into a tech DQ.' },
 
       { h: '4 · Engagement chart' },
@@ -1177,7 +1177,7 @@ const TOPICS = [
         ['Red', '8443-35-002-A', '1400'],
         ['Green (softest)', '8443-35-009-A', '1200']
       ]}},
-      { p: 'Mixing colors lands you between values (e.g. 2 black + 2 white ≈ 3400), and adding heavy weights per shoe drops it further (~100–200 rpm each). Hilliard\'s full chart plots engagement speed vs. heavy weights per shoe for every spring combo — drop it in below for the exact numbers.' },
+      { p: 'Mixing colors lands you between values (e.g. 2 black + 2 white ≈ mid-3000s), and adding heavy weights per shoe drops it further by a modest amount per weight. Hilliard\'s full chart plots engagement speed vs. heavy weights per shoe for every spring combo — drop it in below for the exact numbers.' },
       { img: 'images/clutch-engagement-chart.png', caption: 'Official Hilliard Inferno-Flame engagement chart (springs × heavy weights per shoe).' },
       { note: 'The Hilliard tuning kit (fits Flame/Fury/Blaze/Inferno) carries 4 springs of each color plus 8 heavy and 8 light shoe weights and snap rings — a full tuning range in one box.' }
     ]
@@ -1211,7 +1211,7 @@ const TOPICS = [
       { h: 'Know the limits' },
       { list: [
         'Above ~16 psi cold the tire <b>domes</b> (crowns up) and loses contact patch — grip falls off.',
-        'Below ~10 psi you\'ll hear it <b>squeal</b> in the corners and it can get greasy/overheat on a hot day.',
+        'Watch the low end: the 8–9 psi cold front start is fine, but if <b>hot/running</b> pressure drops much below ~10 psi you\'ll hear it <b>squeal</b> in the corners and it can get greasy/overheat on a hot day.',
         'Keep all four building evenly — a corner that reads much hotter than the others is working too hard (a chassis or pressure imbalance, not the tire).'
       ]},
 
@@ -1244,7 +1244,7 @@ const TOPICS = [
         'Valve-core tool (to fully deflate) and spare TR412 valves if any are cracked.',
         'Dish soap + water in a spray bottle for bead lube — MG says damp soap only; no petroleum grease or tire goo on the Blue.',
         'Air compressor with a clip-on chuck (hands-free) for seating.',
-        'A mud flap or carpet square to work on, and an oven / heat gun / sunny spot to warm a stubborn tire.'
+        'A mud flap or carpet square to work on, and a heat gun or sunny spot to warm a stubborn tire.'
       ]},
 
       { h: 'Dismount' },
@@ -1260,7 +1260,7 @@ const TOPICS = [
       { steps: [
         'Check rotation first — the Blues are <b>directional</b>. Find the arrow on the sidewall and orient the tire to spin the right way for that side of the kart before you start.',
         'Lube the beads — spray dish soap + water on both tire beads and the rim bead seats; slippery helps it slide on and pop out to the seat.',
-        'Optional: warm it — a cold, stiff tire fights you. A few minutes in the sun, a heat gun, or ~200°F in an oven softens it right up.',
+        'Optional: warm it — a cold, stiff tire fights you. A few minutes in the sun or a pass with a heat gun softens it right up (some shops use a low oven, but sun or a heat gun is safer and plenty).',
         'First bead on — start over the smaller/inner rim lip, dropping the opposite side into the drop-center well for slack; work it on by hand or with the irons/machine.',
         'Second bead the same way — keep the mounted section down in the well and lever/roll the rest over the flange.',
         'Reinstall the valve core.'
@@ -1291,11 +1291,12 @@ const TOPICS = [
       { list: [
         'Many builders break in on the same racing oil they\'ll run — switching from a separate break-in oil to race oil can leave residue, so pick one oil and stay with it.',
         'Load the engine rather than free-revving it — the rings seal under load. A few heat cycles / a short loaded run is enough for these engines; some builders consider them ready after just a couple of minutes under load.',
+        'Re-check valve lash after the first few heat cycles — lash tends to grow over the first ~30–60 minutes of run time on a fresh engine, so what you set cold can open up.',
         'If you ever switch oil brands, flush the crankcase thoroughly first.'
       ]},
       { h: 'Oil' },
       { list: [
-        'Common choices are a quality 4-stroke racing oil (e.g. Briggs/AMSOIL 4T) or a straight SAE 30 — consistency matters more than brand-swapping.',
+        'Common choices are a quality 4-stroke racing oil (Briggs recommends its 4T synthetic, ~10W-20) or a straight SAE 30 — consistency matters more than brand-swapping. Capacity is roughly <b>13 oz</b> — fill to the mark, don\'t overfill.',
         'Check level before every session; change on a regular schedule and any time the oil looks dark or gets contaminated.'
       ]},
       { h: 'Pre-race checklist' },
@@ -1343,7 +1344,7 @@ const TOPICS = [
         'Keep the RLV header safety-wired and wrapped and the B91XL baffles unaltered (tech). A blown header gasket shows up as decel popping (see Carb Tuning).',
         'Service the green air filter — clean and sealed to the carb horn; a dirty or loose filter costs power and lets grit in.'
       ]},
-      { tip: 'Log CHT trends on the MyChron and your leak-down numbers across the season — a slow change is the early warning that something\'s wearing.' }
+      { tip: 'Normal LO206 head temp runs roughly <b>375–400°F</b> (up toward ~415°F when the kart binds on exit). Treat CHT as a trend/warning tool, not a primary tuning number — log CHT and your leak-down across the season so a slow change warns you early.' }
     ]
   },
 
@@ -1431,7 +1432,7 @@ const TOPICS = [
       { p: 'Required gear varies a bit by sanctioning body, so confirm your series\' rules — but here\'s the current landscape and how to choose.' },
       { h: 'Helmet' },
       { list: [
-        'Full-face with a visor. Accepted: <b>Snell SA2020/SA2025</b> or <b>K2020/K2025</b> (karting), or an <b>FIA</b>-rated helmet (SA/K 2020 valid through 12/31/2030).',
+        'Full-face with a visor. Accepted: <b>Snell SA2020/SA2025</b> or <b>K2020/K2025</b> (karting), or an <b>FIA</b>-rated helmet. Each series sets how long an older Snell cycle stays legal — confirm the accepted ratings and the cutoff date for your class.',
         'Youth often use Snell CMR/CMS helmets — check your series.',
         'Replace after any hard impact and by the rating\'s expiry; fit snug with no movement.'
       ]},
@@ -1661,11 +1662,11 @@ const TRACKS = [
     path: '340,183 338,171 333,162 325,157 314,155 233,149 227,146 223,141 221,134 220,127 223,119 228,113 235,110 250,105 256,100 257,92 257,85 254,79 248,74 179,36 173,36 168,39 165,44 163,51 161,121 162,140 165,147 171,153 400,342 406,344 417,344 426,340 434,332 439,322 439,312 435,302 430,295 422,289 325,233 322,229 320,225 319,220 320,214 324,207 340,183',
     closed: true,
     layouts: [
-      { name: 'North Track', length: '0.75 mi', turns: null, features: 'Public / rental side · lit for night racing' },
-      { name: 'South Track', length: '0.75 mi', turns: null, features: 'Members & driving school' }
+      { name: 'North Track', length: '≈0.7 mi', turns: null, features: 'Public / rental side · lit for night racing' },
+      { name: 'South Track', length: '≈0.7 mi', turns: null, features: 'Members & driving school' }
     ],
     configs: ['North track (public)', 'South track (members/school)', 'Multiple configurations each'],
-    notes: 'Two 0.75-mile asphalt tracks, each reconfigurable, with full lighting. Turn counts vary by config — add the official maps for exact layouts.'
+    notes: 'Two ~0.7-mile asphalt tracks (the official site lists ~0.7 mi; some directories say 0.75), each reconfigurable, with full lighting. Turn counts vary by config — add the official maps for exact layouts.'
   },
   {
     id: 'ntk',
