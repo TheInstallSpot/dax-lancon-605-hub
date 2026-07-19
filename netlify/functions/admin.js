@@ -84,7 +84,20 @@ export default async (req) => {
     if (!codes[body.id]) return json({ error: 'Not found.' }, 404);
     delete codes[body.id];
     await s.setJSON('codes', codes);
+    // purgeLog: also remove the driver's server log (used by the system self-test cleanup)
+    if (body.purgeLog) { try { await s.delete('log_' + body.id); } catch {} }
     return json({ ok: true });
+  }
+
+  if (body.action === 'selftest') {
+    // Blob storage round-trip: write → read → delete a scratch key.
+    const t0 = Date.now();
+    const val = { at: t0, nonce: Math.random().toString(36).slice(2) };
+    await s.setJSON('selftest', val);
+    const back = await s.get('selftest', { type: 'json' });
+    try { await s.delete('selftest'); } catch {}
+    if (!back || back.nonce !== val.nonce) return json({ error: 'blob round-trip failed' }, 500);
+    return json({ ok: true, ms: Date.now() - t0 });
   }
 
   if (body.action === 'logRoster') {
