@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#0e0d13">
+<title>Dax Lancon Racing 605 — LO206 Hub</title>
+<meta name="description" content="LO206 how-to guides and race-day calculators for Dax Lancon Racing #605.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="605 Hub">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <img class="logo" src="./brand/mark-605.png" alt="605" width="60" height="28">
+  <div>
+    <h1 class="app-title">DAX LANCON RACING</h1>
+    <p class="app-sub">LO206 Team Hub · guides &amp; race-day tools</p>
+  </div>
+  <button id="install-btn" class="install-btn" title="Install app">⤓ Install</button>
+</header>
+
+<main>
+
+  <!-- ===================== GUIDES ===================== -->
+  <section id="view-guides" class="view active">
+    <div class="section-label">How-to &amp; reference</div>
+    <div id="cat-grid"></div>
+    <p class="footer-note">Tap an area to explore its guides. This app is built to grow — send Claude new topics anytime.</p>
+  </section>
+
+  <!-- ===================== GUIDE GROUP ===================== -->
+  <section id="view-group" class="view"></section>
+
+  <!-- ===================== GUIDE CATEGORY ===================== -->
+  <section id="view-guide-cat" class="view"></section>
+
+  <!-- ===================== ARTICLE ===================== -->
+  <section id="view-article" class="view"></section>
+
+  <!-- ===================== TOOLS ===================== -->
+  <section id="view-tools" class="view">
+    <div class="section-label">Race-day calculators</div>
+
+    <!-- Gear ratio -->
+    <div class="tool">
+      <h2>Gear Ratio</h2>
+      <p class="hint">Ratio = axle (driven) teeth ÷ engine clutch (driver) teeth.</p>
+      <div class="row">
+        <div class="field"><label>Engine / clutch sprocket (driver) — teeth</label>
+          <input id="gr-driver" type="number" inputmode="numeric" placeholder="e.g. 17" oninput="calcGear()"></div>
+        <div class="field"><label>Axle sprocket (driven) — teeth</label>
+          <input id="gr-driven" type="number" inputmode="numeric" placeholder="e.g. 64" oninput="calcGear()"></div>
+      </div>
+      <div id="gr-out" class="result"></div>
+    </div>
+
+    <!-- Gear change compare + chart -->
+    <div class="tool">
+      <h2>Gear Change — Compare &amp; Chart</h2>
+      <p class="hint">See exactly what adding or removing axle teeth does to your ratio and top speed. Highlighted row = your current gear.</p>
+      <div class="row three">
+        <div class="field"><label>Driver teeth</label>
+          <input id="gc-driver" type="number" inputmode="numeric" placeholder="17" oninput="calcGearChart()"></div>
+        <div class="field"><label>Current driven</label>
+          <input id="gc-driven" type="number" inputmode="numeric" placeholder="64" oninput="calcGearChart()"></div>
+        <div class="field"><label>Engine RPM</label>
+          <input id="gc-rpm" type="number" inputmode="numeric" placeholder="6100" oninput="calcGearChart()"></div>
+      </div>
+      <div class="field"><label>Rear rollout / circumference (in) — optional, enables speed column</label>
+        <input id="gc-roll" type="number" inputmode="decimal" placeholder="e.g. 33.5" oninput="calcGearChart()"></div>
+      <div id="gc-out"></div>
+    </div>
+
+    <!-- Speed / RPM -->
+    <div class="tool">
+      <h2>Speed &amp; RPM from Gearing</h2>
+      <p class="hint">Estimate top speed at a given engine RPM, gear, and tire size. Theoretical — great for comparing gear changes.</p>
+      <div class="row three">
+        <div class="field"><label>Engine RPM</label>
+          <input id="sp-rpm" type="number" inputmode="numeric" placeholder="e.g. 6100" oninput="calcSpeed()"></div>
+        <div class="field"><label>Driver teeth</label>
+          <input id="sp-driver" type="number" inputmode="numeric" placeholder="17" oninput="calcSpeed()"></div>
+        <div class="field"><label>Driven teeth</label>
+          <input id="sp-driven" type="number" inputmode="numeric" placeholder="64" oninput="calcSpeed()"></div>
+      </div>
+      <div class="field"><label>Tire size input</label>
+        <select id="sp-tiremode" onchange="syncTireMode()">
+          <option value="circ">Rear tire rollout / circumference (in)</option>
+          <option value="dia">Rear tire diameter (in)</option>
+        </select>
+      </div>
+      <div class="field" id="sp-circ-field"><label>Rollout / circumference (inches)</label>
+        <input id="sp-circ" type="number" inputmode="decimal" placeholder="e.g. 33.5" oninput="calcSpeed()"></div>
+      <div class="field" id="sp-dia-field" style="display:none"><label>Tire diameter (inches)</label>
+        <input id="sp-dia" type="number" inputmode="decimal" placeholder="e.g. 10.6" oninput="calcSpeed()"></div>
+      <div id="sp-out" class="result"></div>
+    </div>
+
+    <!-- Weight & ballast -->
+    <div class="tool">
+      <h2>Weight &amp; Ballast</h2>
+      <p class="hint">How much lead to add to hit class minimum with the driver aboard.</p>
+      <div class="row">
+        <div class="field"><label>Class minimum weight (lb)</label>
+          <input id="wb-min" type="number" inputmode="decimal" placeholder="e.g. 360" oninput="calcBallast()"></div>
+        <div class="field"><label>Kart weight, as-raced (lb)</label>
+          <input id="wb-kart" type="number" inputmode="decimal" placeholder="e.g. 165" oninput="calcBallast()"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Driver weight, in gear (lb)</label>
+          <input id="wb-driver" type="number" inputmode="decimal" placeholder="e.g. 150" oninput="calcBallast()"></div>
+        <div class="field"><label>Each ballast weight (lb, optional)</label>
+          <input id="wb-each" type="number" inputmode="decimal" placeholder="e.g. 5" oninput="calcBallast()"></div>
+      </div>
+      <div id="wb-out" class="result"></div>
+    </div>
+  </section>
+
+  <!-- ===================== LOG ===================== -->
+  <section id="view-log" class="view">
+    <div class="section-label">Race log</div>
+    <div class="seg">
+      <button id="seg-session" class="seg-btn active" onclick="setLogMode('session')">＋ Training session</button>
+      <button id="seg-event" class="seg-btn" onclick="setLogMode('event')">＋ Event</button>
+    </div>
+
+    <!-- ---------- TRAINING SESSION ---------- -->
+    <div class="tool" id="form-session">
+      <h2>Log a training session</h2>
+      <p class="hint">A single practice day. Saved on this device.</p>
+      <form id="session-form" onsubmit="saveSession(event)">
+        <div class="row">
+          <div class="field"><label>Date</label><input id="s-date" type="date"></div>
+          <div class="field"><label>Track</label><select id="s-track" data-tracksel onchange="onTrackSelect(this)"></select></div>
+        </div>
+        <div class="field track-other" style="display:none"><label>Track / event name</label><input type="text" placeholder="Type it in"></div>
+        <div class="field"><label>Focus — what are you working on?</label><input id="s-focus" type="text" placeholder="e.g. brake points T3-T5, exit off the hairpin"></div>
+
+        <div class="sub">Gearing</div>
+        <div class="row">
+          <div class="field"><label>Driver teeth</label><input id="s-driver" type="number" inputmode="numeric" placeholder="17" oninput="showRatio('s')"></div>
+          <div class="field"><label>Driven teeth</label><input id="s-driven" type="number" inputmode="numeric" placeholder="64" oninput="showRatio('s')"></div>
+        </div>
+        <div class="ratio-out" id="s-ratio"></div>
+
+        <div class="sub">Conditions</div>
+        <div class="row three">
+          <div class="field"><label>Air °F</label><input id="s-atemp" type="text" inputmode="decimal" placeholder="72"></div>
+          <div class="field"><label>Track °F</label><input id="s-ttemp" type="text" inputmode="decimal" placeholder="95"></div>
+          <div class="field"><label>Weather</label><input id="s-weather" type="text" placeholder="sunny"></div>
+        </div>
+
+        <div class="sub">Tires (Evinco Blue — aim ~2 psi rise)</div>
+        <div class="row"><div class="field"><label>Cold front / rear psi</label><input id="s-tcold" type="text" placeholder="9 / 11"></div>
+          <div class="field"><label>Hot front / rear psi</label><input id="s-thot" type="text" placeholder="11 / 13"></div></div>
+
+        <div class="sub">Engine &amp; clutch</div>
+        <div class="row"><div class="field"><label>Lash intake / exhaust</label><input id="s-lash" type="text" placeholder=".005 / .005"></div>
+          <div class="field"><label>Clutch springs</label><input id="s-spring" type="text" placeholder="2 blk + 2 wht"></div></div>
+        <div class="row three">
+          <div class="field"><label>Engagement rpm</label><input id="s-eng" type="text" inputmode="numeric" placeholder="3400"></div>
+          <div class="field"><label>End-of-straight rpm</label><input id="s-eos" type="text" inputmode="numeric" placeholder="6100"></div>
+          <div class="field"><label>CHT °F</label><input id="s-cht" type="text" inputmode="numeric" placeholder="168"></div>
+        </div>
+
+        <div class="sub">Results</div>
+        <div class="field"><label>Best lap</label><input id="s-lap" type="text" placeholder="43.21"></div>
+        <div class="field"><label>What I changed</label><input id="s-changed" type="text" placeholder="+2 tooth, dropped 0.5 psi rear"></div>
+        <div class="field"><label>Notes — how it felt</label><textarea id="s-notes" rows="3" placeholder="Loose on entry, good drive off the hairpin…"></textarea></div>
+        <div class="btn-row"><button class="btn" type="submit">Save session</button></div>
+      </form>
+    </div>
+
+    <!-- ---------- EVENT ---------- -->
+    <div class="tool" id="form-event" style="display:none">
+      <h2>Log an event</h2>
+      <p class="hint">A race weekend. Create it here, then open it below to add each session (practice, qualifying, heats, final) over the days.</p>
+      <form id="event-form" onsubmit="saveEvent(event)">
+        <div class="field"><label>Event name</label><input id="e-name" type="text" placeholder="e.g. TX ProKart Series — Rd 3"></div>
+        <div class="row">
+          <div class="field"><label>Track</label><select id="e-track" data-tracksel onchange="onTrackSelect(this)"></select></div>
+          <div class="field"><label>Class</label><input id="e-class" type="text" placeholder="LO206 Sr"></div>
+        </div>
+        <div class="field track-other" style="display:none"><label>Track / event name</label><input type="text" placeholder="Type it in"></div>
+        <div class="row"><div class="field"><label>Start date</label><input id="e-start" type="date"></div>
+          <div class="field"><label>End date</label><input id="e-end" type="date"></div></div>
+        <div class="row three">
+          <div class="field"><label>Driver</label><input id="e-driver-name" type="text" placeholder="Dax"></div>
+          <div class="field"><label>Engine #</label><input id="e-engine" type="text" placeholder="605-A"></div>
+          <div class="field"><label>Tire set</label><input id="e-tireset" type="text" placeholder="new / HC1"></div>
+        </div>
+
+        <div class="sub">Starting baseline</div>
+        <div class="row"><div class="field"><label>Gear driver / driven</label><input id="e-gear" type="text" placeholder="17 / 64"></div>
+          <div class="field"><label>Cold tires F / R</label><input id="e-tcold" type="text" placeholder="9 / 11"></div></div>
+        <div class="row three">
+          <div class="field"><label>Lash i / e</label><input id="e-lash" type="text" placeholder=".005/.005"></div>
+          <div class="field"><label>Clutch springs</label><input id="e-spring" type="text" placeholder="2blk+2wht"></div>
+          <div class="field"><label>Engage rpm</label><input id="e-eng" type="text" placeholder="3400"></div>
+        </div>
+        <div class="field"><label>Weekend notes / goals</label><textarea id="e-notes" rows="2" placeholder="Target: top-5 in the final. Watch tire wear in the heat."></textarea></div>
+        <div class="btn-row"><button class="btn" type="submit">Create event</button></div>
+      </form>
+    </div>
+
+    <div class="btn-row" style="margin:4px 2px 14px"><button class="btn ghost" type="button" onclick="exportLog()">Export all to CSV</button></div>
+    <div class="section-label">Saved — tap to open</div>
+    <div id="log-list"></div>
+  </section>
+
+  <!-- ===================== LOG DETAIL ===================== -->
+  <section id="view-log-detail" class="view"></section>
+
+  <!-- ===================== TRACKS ===================== -->
+  <section id="view-tracks" class="view">
+    <div class="section-label">Our tracks · layouts &amp; info</div>
+    <div id="track-grid" class="grid"></div>
+    <p class="footer-note">Drop an official layout image in images/tracks/ (or send it to Claude) and it shows on the track page. Add more tracks anytime.</p>
+  </section>
+
+  <!-- ===================== TRACK DETAIL ===================== -->
+  <section id="view-track-detail" class="view"></section>
+
+</main>
+
+<!-- ===================== BOTTOM NAV ===================== -->
+<nav class="tabbar" role="tablist">
+  <button data-view="view-guides" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 5v14a2 2 0 002 2h12a2 2 0 002-2V5M8 9h8M8 13h6"/></svg>
+    Guides
+  </button>
+  <button data-view="view-tools">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 01-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4l-2.5 2.5-2-2 2.5-2.5z"/></svg>
+    Tools
+  </button>
+  <button data-view="view-tracks">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l6-3 4 3 6-3v15l-6 3-4-3-6 3z"/><path d="M10 3v15M14 6v15"/></svg>
+    Tracks
+  </button>
+  <button data-view="view-log">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v4M16 3v4M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/></svg>
+    Log
+  </button>
+</nav>
+
+<script src="./content.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

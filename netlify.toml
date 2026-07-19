@@ -1,0 +1,70 @@
+# Dax Lancon Racing 605 — LO206 Hub · Netlify config
+# Static PWA. No build step — publish the repo root as-is.
+
+[build]
+  publish = "."
+  command = ""
+
+# --- Headers ---------------------------------------------------------------
+# The service worker manages offline caching. Keep the SERVER-side (browser
+# HTTP) cache short on the shell files so a new deploy actually reaches the
+# team's phones instead of being masked by a stale disk-cached copy.
+
+# Service worker: never HTTP-cache. Browsers must re-check it every load so a
+# new sw.js (with a bumped CACHE version) is picked up and can update clients.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+# App shell / logic: revalidate every load (cheap; files are small).
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/app.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/content.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Manifest: correct content-type + light caching.
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+# Icons & photos: safe to cache hard (names/versions change when content does).
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/brand/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# --- SPA fallback ----------------------------------------------------------
+# Single-page app: unknown paths serve index.html so deep links / refresh work.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
