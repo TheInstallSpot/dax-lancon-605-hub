@@ -4,7 +4,9 @@ import { getStore } from '@netlify/blobs';
 import crypto from 'node:crypto';
 
 export const STORE = 'dlr605-auth';
-export const store = () => getStore(STORE);
+// strong consistency: a code created/revoked in admin is IMMEDIATELY visible to
+// gate logins and sync checks (default 'eventual' can serve stale reads).
+export const store = () => getStore({ name: STORE, consistency: 'strong' });
 
 export const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), {
