@@ -273,6 +273,10 @@ body.modal-open{overflow:hidden}
 .gate-msg{min-height:18px;color:#ff8f8f;font-size:13px;margin:10px 2px 4px}
 .gate-btn{width:100%;margin-top:6px;font-size:15px;padding:13px}
 .gate-foot{font-size:11.5px;color:var(--muted);margin:16px 0 0;opacity:.85}
+.gate-owner{margin-top:14px;background:none;border:0;color:var(--muted);font-size:12px;
+  cursor:pointer;opacity:.7;text-decoration:underline;text-underline-offset:3px;transition:color .12s,opacity .12s}
+.gate-owner:hover{color:var(--accent);opacity:1}
+.owner-enter{width:100%;margin-bottom:14px}
 
 /* ---- admin overlay / sheet ---- */
 .overlay{position:fixed;inset:0;z-index:210;display:flex;align-items:flex-end;justify-content:center;

@@ -9,6 +9,7 @@
   const GATE_TOKEN = 'dlr605_gate';
   const GATE_NAME = 'dlr605_name';
   const ADMIN_TOKEN = 'dlr605_admin';
+  const OWNER_KEY = 'dlr605_owner';
 
   const $id = (i) => document.getElementById(i);
   const esc = (s) => (s == null ? '' : String(s)).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -85,6 +86,7 @@
   }
 
   async function gateInit() {
+    if (localStorage.getItem(OWNER_KEY) === '1') { hideGate(); return; } // owner bypass
     const token = getToken();
     if (!token) { showGate(); return; }
     hideGate(); // trust cached token so the pit works offline
@@ -100,6 +102,7 @@
   /* ---------------- admin ---------------- */
   function openAdmin() { const o = $id('admin'); if (o) { o.classList.remove('hidden'); document.body.classList.add('modal-open'); routeAdmin(); } }
   function closeAdmin() { const o = $id('admin'); if (o) o.classList.add('hidden'); document.body.classList.remove('modal-open'); }
+  function ownerEnter() { localStorage.setItem(OWNER_KEY, '1'); closeAdmin(); hideGate(); toast('Welcome, Lee 🏁'); }
   function adminBody() { return $id('admin-body'); }
 
   async function adminApi(action, extra) {
@@ -168,6 +171,7 @@
     tab = tab || renderPanel._tab || 'codes';
     renderPanel._tab = tab;
     adminBody().innerHTML = adminHead('Back office') + `
+      <button class="btn owner-enter" onclick="DLRauth.ownerEnter()">Enter the app →</button>
       <div class="admin-tabs">${tabBtn('codes', 'Access codes', tab === 'codes')}${tabBtn('logs', 'Driver logs', tab === 'logs')}${tabBtn('security', 'Password', tab === 'security')}</div>
       <div id="admin-tab"></div>`;
     if (tab === 'codes') renderCodes();
@@ -295,7 +299,7 @@
     try { await adminApi('changePassword', { current: cur, newPassword: np }); toast('Password changed ✔'); $id('sp-cur').value = ''; $id('sp-new').value = ''; }
     catch (e) { msg.textContent = e.message; }
   }
-  function logout() { localStorage.removeItem(ADMIN_TOKEN); routeAdmin(); }
+  function logout() { localStorage.removeItem(ADMIN_TOKEN); localStorage.removeItem(OWNER_KEY); if (!getToken()) showGate(); routeAdmin(); }
 
   function rel(ts) {
     const s = Math.floor((Date.now() - ts) / 1000);
@@ -308,7 +312,7 @@
 
   /* ---------------- wire up ---------------- */
   window.DLRauth = {
-    openAdmin, closeAdmin, gateLogin, doSetup, doLogin, tab,
+    openAdmin, closeAdmin, ownerEnter, gateLogin, doSetup, doLogin, tab,
     createCode, codeAct, codeDelete, openDriver, changePw, logout
   };
 
