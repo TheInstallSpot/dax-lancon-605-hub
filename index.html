@@ -23,6 +23,9 @@
     <p class="app-sub">LO206 Team Hub · guides &amp; race-day tools</p>
   </div>
   <button id="install-btn" class="install-btn" title="Install app">⤓ Install</button>
+  <button id="admin-btn" class="admin-btn" title="Admin" aria-label="Admin back office">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+  </button>
 </header>
 
 <main>
@@ -249,7 +252,29 @@
   </button>
 </nav>
 
+<!-- ===================== PIN GATE ===================== -->
+<div id="gate" class="gate hidden">
+  <div class="gate-card">
+    <img class="gate-logo" src="./brand/mark-605.png" alt="605" width="96" height="45">
+    <h1 class="gate-title">DAX LANCON RACING</h1>
+    <p class="gate-sub">Team app · enter your access code</p>
+    <form id="gate-form" autocomplete="off">
+      <input id="gate-pin" class="gate-pin" type="password" inputmode="numeric" maxlength="8"
+             autocomplete="off" placeholder="••••" aria-label="Access code">
+      <div id="gate-msg" class="gate-msg" role="alert"></div>
+      <button id="gate-btn" class="btn gate-btn" type="submit">Enter</button>
+    </form>
+    <p class="gate-foot">Need a code? Ask Lee to add you.</p>
+  </div>
+</div>
+
+<!-- ===================== ADMIN BACK OFFICE ===================== -->
+<div id="admin" class="overlay hidden">
+  <div class="sheet"><div id="admin-body"></div></div>
+</div>
+
 <script src="./content.js"></script>
 <script src="./app.js"></script>
+<script src="./auth.js"></script>
 </body>
 </html>

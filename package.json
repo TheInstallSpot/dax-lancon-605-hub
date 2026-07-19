@@ -1,0 +1,10 @@
+{
+  "name": "dax-lancon-605-hub",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DAX LANCON RACING 605 — LO206 Team Hub. Serverless auth + log sync via Netlify Functions and Blobs.",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

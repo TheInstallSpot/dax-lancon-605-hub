@@ -400,6 +400,7 @@ function loadLog() {
   } catch { return []; }
 }
 const saveLog = arr => localStorage.setItem(LOG_KEY, JSON.stringify(arr));
+function syncLog() { if (typeof window.DLRSync === 'function') window.DLRSync(); }
 const gv = id => { const n = $(id); return n ? n.value.trim() : ''; };
 const today = () => new Date().toISOString().slice(0, 10);
 function ratioText(g) { const m = (g || '').split('/').map(x => parseFloat(x)); return (m[0] && m[1]) ? ` (${fmt(m[1] / m[0], 2)}:1)` : ''; }
@@ -415,7 +416,7 @@ function setLogMode(mode) {
 function saveSession(e) {
   e.preventDefault();
   const entry = {
-    id: Date.now(), kind: 'session',
+    id: Date.now(), updatedAt: Date.now(), kind: 'session',
     date: gv('#s-date') || today(), track: trackValue($('#s-track')) || 'Untitled',
     focus: gv('#s-focus'), driver: gv('#s-driver'), driven: gv('#s-driven'),
     atemp: gv('#s-atemp'), ttemp: gv('#s-ttemp'), weather: gv('#s-weather'),
@@ -425,12 +426,12 @@ function saveSession(e) {
   };
   const log = loadLog(); log.unshift(entry); saveLog(log);
   $('#session-form').reset(); $$('#form-session .track-other').forEach(x => x.style.display = 'none'); showRatio('s');
-  renderLog(); openLogEntry(entry.id);
+  renderLog(); openLogEntry(entry.id); syncLog();
 }
 function saveEvent(e) {
   e.preventDefault();
   const entry = {
-    id: Date.now(), kind: 'event', name: gv('#e-name') || 'Untitled event',
+    id: Date.now(), updatedAt: Date.now(), kind: 'event', name: gv('#e-name') || 'Untitled event',
     track: trackValue($('#e-track')), cls: gv('#e-class'), start: gv('#e-start'), end: gv('#e-end'),
     driverName: gv('#e-driver-name'), engine: gv('#e-engine'), tireset: gv('#e-tireset'),
     gear: gv('#e-gear'), tcold: gv('#e-tcold'), lash: gv('#e-lash'), spring: gv('#e-spring'), eng: gv('#e-eng'),
@@ -438,23 +439,29 @@ function saveEvent(e) {
   };
   const log = loadLog(); log.unshift(entry); saveLog(log);
   $('#event-form').reset(); $$('#form-event .track-other').forEach(x => x.style.display = 'none');
-  renderLog(); openLogEntry(entry.id);
+  renderLog(); openLogEntry(entry.id); syncLog();
 }
-function deleteEntry(id) { saveLog(loadLog().filter(e => e.id !== id)); renderLog(); go('view-log'); }
+function deleteEntry(id) {
+  const log = loadLog(); const e = log.find(x => x.id === id);
+  if (e) { e.deleted = true; e.updatedAt = Date.now(); }
+  saveLog(log); renderLog(); go('view-log'); syncLog();
+}
 function addEventSession(eventId, e) {
   e.preventDefault();
   const log = loadLog(); const ev = log.find(x => x.id === eventId); if (!ev) return;
   ev.sessions = ev.sessions || [];
   ev.sessions.push({ id: Date.now(), type: gv('#as-type'), date: gv('#as-date'), lap: gv('#as-lap'), result: gv('#as-result'), gear: gv('#as-gear'), tires: gv('#as-tires'), changed: gv('#as-changed'), notes: gv('#as-notes') });
-  saveLog(log); openLogEntry(eventId);
+  ev.updatedAt = Date.now();
+  saveLog(log); openLogEntry(eventId); syncLog();
 }
 function deleteEventSession(eventId, sid) {
   const log = loadLog(); const ev = log.find(x => x.id === eventId); if (!ev) return;
-  ev.sessions = (ev.sessions || []).filter(s => s.id !== sid); saveLog(log); openLogEntry(eventId);
+  ev.sessions = (ev.sessions || []).filter(s => s.id !== sid); ev.updatedAt = Date.now();
+  saveLog(log); openLogEntry(eventId); syncLog();
 }
 
 function renderLog() {
-  const wrap = $('#log-list'); const log = loadLog();
+  const wrap = $('#log-list'); const log = loadLog().filter(e => !e.deleted);
   if (!log.length) { wrap.innerHTML = `<div class="empty">Nothing logged yet.<br>Log a training session or create an event above.</div>`; return; }
   wrap.innerHTML = '';
   log.forEach(e => {
@@ -478,7 +485,7 @@ function renderLog() {
 }
 function lrow(label, val) { return val ? `<tr><td>${label}</td><td>${escapeHTML(val)}</td></tr>` : ''; }
 function openLogEntry(id) {
-  const e = loadLog().find(x => x.id === id); if (!e) return;
+  const e = loadLog().find(x => x.id === id); if (!e || e.deleted) return;
   const v = $('#view-log-detail');
   if (e.kind === 'event') {
     const info = [lrow('Track', e.track), lrow('Class', e.cls), lrow('Dates', [e.start, e.end].filter(Boolean).join(' – ')),
@@ -523,7 +530,7 @@ function openLogEntry(id) {
 function escapeHTML(s) { return (s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
 function exportLog() {
-  const log = loadLog(); if (!log.length) return;
+  const log = loadLog().filter(e => !e.deleted); if (!log.length) return;
   const rows = [['kind', 'name/track', 'date(s)', 'class', 'gear', 'tires', 'lash', 'clutch', 'best lap', 'result', 'changed', 'notes']];
   log.forEach(e => {
     if (e.kind === 'event') {

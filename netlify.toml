@@ -62,6 +62,14 @@
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
+# --- Serverless functions --------------------------------------------------
+# Clean path for the auth + log-sync functions. Must come BEFORE the SPA
+# fallback so function calls aren't swallowed by the index.html catch-all.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 # --- SPA fallback ----------------------------------------------------------
 # Single-page app: unknown paths serve index.html so deep links / refresh work.
 [[redirects]]
