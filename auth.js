@@ -172,10 +172,11 @@
     renderPanel._tab = tab;
     adminBody().innerHTML = adminHead('Back office') + `
       <button class="btn owner-enter" onclick="DLRauth.ownerEnter()">Enter the app →</button>
-      <div class="admin-tabs">${tabBtn('codes', 'Access codes', tab === 'codes')}${tabBtn('logs', 'Driver logs', tab === 'logs')}${tabBtn('security', 'Password', tab === 'security')}</div>
+      <div class="admin-tabs">${tabBtn('codes', 'Codes', tab === 'codes')}${tabBtn('logs', 'Logs', tab === 'logs')}${tabBtn('security', 'Password', tab === 'security')}${tabBtn('system', 'System', tab === 'system')}</div>
       <div id="admin-tab"></div>`;
     if (tab === 'codes') renderCodes();
     else if (tab === 'logs') renderLogsRoster();
+    else if (tab === 'system') renderSystem();
     else renderSecurity();
   }
   const tab = (t) => renderPanel(t);
@@ -280,6 +281,143 @@
       <div class="muted">${bits}</div>${e.focus ? '<div>' + esc(e.focus) + '</div>' : ''}${e.notes ? '<div class="muted">' + esc(e.notes) + '</div>' : ''}</div>`;
   }
 
+  /* ---- system check (smoke test) tab ---- */
+  function renderSystem() {
+    $id('admin-tab').innerHTML = `
+      <p class="hint" style="margin:0 0 12px">Runs the whole stack through its paces: server functions, storage, a full
+      create&nbsp;→&nbsp;PIN&nbsp;login&nbsp;→&nbsp;log&nbsp;sync&nbsp;→&nbsp;revoke round-trip with a throwaway code, plus app assets and content.
+      Safe to run anytime — it cleans up after itself. (If a run is interrupted, delete any leftover "⚙ Smoke test" code in the Codes tab.)</p>
+      <div class="btn-row"><button class="btn" id="sys-run" onclick="DLRauth.runSmoke()">Run system check</button></div>
+      <div id="sys-results" class="code-list" style="margin-top:14px"></div>
+      <div id="sys-summary"></div>`;
+  }
+
+  async function runSmoke() {
+    const btn = $id('sys-run'), out = $id('sys-results'), sum = $id('sys-summary');
+    if (!out) return;
+    if (!navigator.onLine) { out.innerHTML = `<div class="empty">You're offline — the system check needs a connection.</div>`; return; }
+    btn.disabled = true; btn.textContent = 'Running…';
+    out.innerHTML = ''; sum.innerHTML = '';
+    const smoke = {};
+    let pass = 0, warn = 0, fail = 0;
+
+    const row = (name) => {
+      const r = document.createElement('div');
+      r.className = 'sys-row';
+      r.innerHTML = `<span class="sys-ic run">⟳</span><div class="sys-main"><div class="sys-name">${esc(name)}</div><div class="sys-detail">running…</div></div>`;
+      out.appendChild(r);
+      return r;
+    };
+    const settle = (r, state, detail) => {
+      const ic = r.querySelector('.sys-ic');
+      ic.className = 'sys-ic ' + state;
+      ic.textContent = state === 'ok' ? '✓' : state === 'warn' ? '!' : '✕';
+      r.querySelector('.sys-detail').textContent = detail;
+      if (state === 'ok') pass++; else if (state === 'warn') warn++; else fail++;
+    };
+    const step = async (name, fn) => {
+      const r = row(name);
+      try {
+        const res = (await fn()) || {};
+        settle(r, res.warn ? 'warn' : 'ok', res.detail || 'OK');
+      } catch (e) {
+        settle(r, 'fail', e.message || 'failed');
+      }
+    };
+
+    await step('Server functions reachable', async () => {
+      const t0 = performance.now();
+      const d = await api('admin', { action: 'status' });
+      return { detail: `${Math.round(performance.now() - t0)} ms · setup ${d.needsSetup ? 'NEEDED' : 'complete'}`, warn: !!d.needsSetup };
+    });
+    await step('Admin session valid', async () => {
+      const d = await adminApi('list');
+      return { detail: `${d.codes.length} access code(s) on file` };
+    });
+    await step('Storage (Blobs) read/write', async () => {
+      const d = await adminApi('selftest');
+      return { detail: `blob write→read→delete in ${d.ms} ms` };
+    });
+    await step('Create throwaway test code', async () => {
+      const d = await adminApi('create', { name: '⚙ Smoke test (auto)' });
+      smoke.cid = d.code.id; smoke.pin = d.code.pin;
+      return { detail: 'PIN ' + d.code.pin + ' issued' };
+    });
+    await step('Racer PIN login', async () => {
+      if (!smoke.pin) throw new Error('skipped — no test code');
+      const d = await api('gate', { action: 'login', pin: smoke.pin });
+      smoke.token = d.token;
+      return { detail: `token issued to "${d.name}"` };
+    });
+    await step('Token validation', async () => {
+      if (!smoke.token) throw new Error('skipped — no token');
+      const d = await api('gate', { action: 'validate', token: smoke.token });
+      if (!d.valid) throw new Error('server says token invalid');
+      return { detail: 'server confirms token valid' };
+    });
+    await step('Log sync round-trip', async () => {
+      if (!smoke.token) throw new Error('skipped — no token');
+      const entry = { id: Date.now(), updatedAt: Date.now(), kind: 'session', track: '⚙ SMOKE TEST', date: '2000-01-01' };
+      const d = await api('logsync', { action: 'sync', token: smoke.token, entries: [entry] });
+      if (!(d.entries || []).some((x) => x.track === '⚙ SMOKE TEST')) throw new Error('test entry did not round-trip');
+      return { detail: 'entry synced up & back' };
+    });
+    await step('Admin can read the driver log', async () => {
+      if (!smoke.cid) throw new Error('skipped — no test code');
+      const d = await adminApi('driverLog', { id: smoke.cid });
+      if (!(d.entries || []).some((x) => x.track === '⚙ SMOKE TEST')) throw new Error('entry not visible to admin');
+      return { detail: `visible under "${d.name}"` };
+    });
+    await step('Revocation cuts access', async () => {
+      if (!smoke.cid || !smoke.token) throw new Error('skipped — no test code');
+      await adminApi('revoke', { id: smoke.cid });
+      const v = await api('gate', { action: 'validate', token: smoke.token });
+      if (v.valid) throw new Error('revoked token still validates');
+      let blocked = false;
+      try { await api('logsync', { action: 'sync', token: smoke.token, entries: [] }); } catch { blocked = true; }
+      if (!blocked) throw new Error('revoked code can still sync');
+      return { detail: 'token dead · sync blocked' };
+    });
+    await step('Cleanup', async () => {
+      if (!smoke.cid) return { detail: 'nothing to clean', warn: true };
+      await adminApi('delete', { id: smoke.cid, purgeLog: true });
+      return { detail: 'test code & test log removed' };
+    });
+    await step('App shell assets', async () => {
+      const bust = Date.now();
+      const r1 = await fetch('./content.js?smoke=' + bust, { cache: 'no-store' });
+      const r2 = await fetch('./index.html?smoke=' + bust, { cache: 'no-store' });
+      if (!r1.ok || !r2.ok) throw new Error('asset fetch failed (' + r1.status + '/' + r2.status + ')');
+      return { detail: 'index + content served fresh' };
+    });
+    await step('Offline cache (service worker)', async () => {
+      if (!('serviceWorker' in navigator)) return { detail: 'not supported in this browser', warn: true };
+      const reg = await navigator.serviceWorker.getRegistration();
+      const keys = (window.caches ? await caches.keys() : []);
+      const ver = keys.find((k) => /^dlr605-v/.test(k));
+      if (!reg || !ver) return { detail: reg ? 'registered, cache not built yet' : 'not registered yet', warn: true };
+      return { detail: ver + ' active — offline ready' };
+    });
+    await step('Content integrity', async () => {
+      const t = (typeof TOPICS !== 'undefined') && TOPICS.length;
+      const tr = (typeof TRACKS !== 'undefined') && TRACKS.length;
+      const c = (typeof CATEGORIES !== 'undefined') && CATEGORIES.length;
+      const g = (typeof GROUPS !== 'undefined') && GROUPS.length;
+      if (!t || !tr || !c || !g) throw new Error('content arrays missing');
+      const missing = CATEGORIES.flatMap((cat) => cat.ids.filter((id) => !TOPICS.some((tp) => tp.id === id)));
+      if (missing.length) throw new Error('guides missing: ' + missing.join(', '));
+      const calcs = ['calcGear', 'calcGearChart', 'calcSpeed', 'calcBallast'].filter((f) => typeof window[f] !== 'function');
+      if (calcs.length) throw new Error('calculators missing: ' + calcs.join(', '));
+      return { detail: `${t} guides · ${c} categories · ${g} groups · ${tr} tracks · calculators OK` };
+    });
+
+    const total = pass + warn + fail;
+    sum.innerHTML = `<div class="sys-sum ${fail ? 'bad' : warn ? 'mid' : 'good'}">
+      ${fail ? '✕' : warn ? '!' : '✓'} ${pass}/${total} passed${warn ? ` · ${warn} warning${warn > 1 ? 's' : ''}` : ''}${fail ? ` · ${fail} FAILED` : ''}
+      ${fail ? '— something needs attention.' : warn ? '— all core systems go.' : '— all systems go. 🏁'}</div>`;
+    btn.disabled = false; btn.textContent = 'Run again';
+  }
+
   /* ---- security tab ---- */
   function renderSecurity() {
     $id('admin-tab').innerHTML = `
@@ -313,7 +451,7 @@
   /* ---------------- wire up ---------------- */
   window.DLRauth = {
     openAdmin, closeAdmin, ownerEnter, gateLogin, doSetup, doLogin, tab,
-    createCode, codeAct, codeDelete, openDriver, changePw, logout
+    createCode, codeAct, codeDelete, openDriver, changePw, logout, runSmoke
   };
 
   window.addEventListener('DOMContentLoaded', () => {
