@@ -7,6 +7,8 @@ export const STORE = 'dlr605-auth';
 // strong consistency: a code created/revoked in admin is IMMEDIATELY visible to
 // gate logins and sync checks (default 'eventual' can serve stale reads).
 export const store = () => getStore({ name: STORE, consistency: 'strong' });
+// separate store for team photos (guide slots + event/log photos)
+export const photoStore = () => getStore({ name: 'dlr605-photos', consistency: 'strong' });
 
 export const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), {
