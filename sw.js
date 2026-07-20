@@ -2,7 +2,7 @@
    Offline-first caching. Bump CACHE version when you change app files.
    Photos live in a SEPARATE cache (IMG_CACHE) so bumping CACHE for a
    content update does NOT wipe already-downloaded kart photos. */
-const CACHE = 'dlr605-v22';
+const CACHE = 'dlr605-v23';
 const IMG_CACHE = 'dlr605-images-v1';
 const isImage = req =>
   req.destination === 'image' ||
@@ -47,9 +47,11 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
 
-  // Never cache auth / serverless calls — always hit the network live.
+  // Photos (including team photos served from /api/photos?get=… — their URLs are
+  // versioned, so cache-first is safe) go to the persistent image cache. All OTHER
+  // auth/serverless calls always hit the network live.
   const path = new URL(req.url).pathname;
-  if (path.startsWith('/api/') || path.startsWith('/.netlify/')) return;
+  if ((path.startsWith('/api/') || path.startsWith('/.netlify/')) && !isImage(req)) return;
 
   // Photos: cache-first from the persistent image cache, then network, then store.
   if (isImage(req)) {

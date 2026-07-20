@@ -138,11 +138,28 @@ function blockToHTML(b) {
   if (b.note) return `<div class="box note">${b.note}</div>`;
   if (b.diagram) return `<div class="diagram">${DIAGRAMS[b.diagram] || ''}</div>`;
   if (b.img) {
+    // server photo takes over the slot when one has been uploaded
+    const slot = (window.DLRphotos ? DLRphotos.slugify(b.img) : null);
+    const gp = slot && window.GUIDE_PHOTOS && window.GUIDE_PHOTOS[slot];
+    const admin = window.DLRphotos && DLRphotos.isAdmin();
+    if (gp) {
+      const src = DLRphotos.photoUrl('guide/' + slot, gp.v);
+      return `<figure class="photo live">
+        <img src="${src}" alt="${(b.alt || b.caption || 'kart photo').replace(/"/g, '&quot;')}" loading="lazy"
+             onclick="DLRphotos.viewPhoto('${src}')">
+        ${b.caption ? `<figcaption>${b.caption}</figcaption>` : ''}
+        ${admin ? `<div class="slot-admin">
+          <label class="mini">Replace<input type="file" accept="image/*" hidden onchange="DLRphotos.uploadGuidePhoto('${slot}',this)"></label>
+          <button class="mini danger" onclick="DLRphotos.deleteGuidePhoto('${slot}')">Remove</button>
+        </div>` : ''}
+      </figure>`;
+    }
     const cap = b.caption ? `<figcaption>${b.caption}</figcaption>` : '';
     const alt = (b.alt || b.caption || 'kart photo').replace(/"/g, '&quot;');
+    const uploadBtn = (admin && slot) ? `<label class="mini slot-upload">📷 Upload this photo<input type="file" accept="image/*" hidden onchange="DLRphotos.uploadGuidePhoto('${slot}',this)"></label>` : '';
     return `<figure class="photo">
       <img src="${b.img}" alt="${alt}" loading="lazy" onerror="this.closest('.photo').classList.add('missing')">
-      <div class="ph"><span class="cam">📷</span><b>PHOTO TO ADD</b><code>${b.img}</code>${b.caption ? `<span>${b.caption}</span>` : ''}</div>
+      <div class="ph"><span class="cam">📷</span><b>PHOTO TO ADD</b><code>${b.img}</code>${b.caption ? `<span>${b.caption}</span>` : ''}${uploadBtn}</div>
       ${cap}
     </figure>`;
   }
@@ -156,6 +173,7 @@ function blockToHTML(b) {
 function openArticle(id) {
   const t = TOPICS.find(x => x.id === id);
   if (!t) return;
+  window._cur = { kind: 'article', id };
   const v = $('#view-article');
   v.innerHTML =
     `<button class="back" onclick="go('view-guides')">‹ All guides</button>
@@ -208,14 +226,30 @@ function trackOutlineSVG(d, closed) {
   </svg>`;
 }
 function trackMapHTML(t) {
+  const slot = (window.DLRphotos ? DLRphotos.slugify(t.map) : null);
+  const gp = slot && window.GUIDE_PHOTOS && window.GUIDE_PHOTOS[slot];
+  const admin = window.DLRphotos && DLRphotos.isAdmin();
+  if (gp) {
+    const src = DLRphotos.photoUrl('guide/' + slot, gp.v);
+    return `<figure class="photo trackmap live">
+      <img src="${src}" alt="${escapeHTML(t.name)} official layout" loading="lazy" onclick="DLRphotos.viewPhoto('${src}')">
+      <figcaption>${escapeHTML(t.name)} — official layout</figcaption>
+      ${admin ? `<div class="slot-admin">
+        <label class="mini">Replace<input type="file" accept="image/*" hidden onchange="DLRphotos.uploadGuidePhoto('${slot}',this)"></label>
+        <button class="mini danger" onclick="DLRphotos.deleteGuidePhoto('${slot}')">Remove</button>
+      </div>` : ''}
+    </figure>`;
+  }
+  const uploadBtn = (admin && slot) ? `<label class="mini slot-upload">🗺️ Upload the official map<input type="file" accept="image/*" hidden onchange="DLRphotos.uploadGuidePhoto('${slot}',this)"></label>` : '';
   return `<figure class="photo trackmap">
     <img src="${t.map}" alt="${escapeHTML(t.name)} official layout" loading="lazy" onerror="this.closest('.photo').classList.add('missing')">
-    <div class="ph"><span class="cam">🗺️</span><b>OFFICIAL MAP — add image</b><code>${t.map}</code><span>Drop the ${escapeHTML(t.name)} official layout here</span></div>
+    <div class="ph"><span class="cam">🗺️</span><b>OFFICIAL MAP — add image</b><code>${t.map}</code><span>Drop the ${escapeHTML(t.name)} official layout here</span>${uploadBtn}</div>
   </figure>`;
 }
 function openTrack(id) {
   const t = TRACKS.find(x => x.id === id);
   if (!t) return;
+  window._cur = { kind: 'track', id };
   const info = [];
   if (t.address) info.push(`<tr><td>Address</td><td>${escapeHTML(t.address)}</td></tr>`);
   if (t.surface) info.push(`<tr><td>Surface</td><td>${escapeHTML(t.surface)}</td></tr>`);
@@ -249,6 +283,14 @@ function openTrack(id) {
      </div>`;
   showView('view-track-detail');
 }
+// re-render whatever guide/track view is open (after a photo upload changes a slot)
+window.rerenderCurrent = function () {
+  const c = window._cur;
+  if (!c) { return; }
+  if (c.kind === 'article') openArticle(c.id);
+  else if (c.kind === 'track') openTrack(c.id);
+};
+
 function trackOptions(sel) {
   return '<option value="">— select a track —</option>'
     + (typeof TRACKS === 'undefined' ? '' : TRACKS.map(t => `<option value="${escapeHTML(t.name)}"${sel === t.name ? ' selected' : ''}>${escapeHTML(t.name)}</option>`).join(''))
@@ -415,6 +457,8 @@ function loadLog() {
   } catch { return []; }
 }
 const saveLog = arr => localStorage.setItem(LOG_KEY, JSON.stringify(arr));
+// expose for auth.js (log sync + photo attach) — consts aren't window props
+window.loadLog = loadLog; window.saveLog = saveLog;
 function syncLog() { if (typeof window.DLRSync === 'function') window.DLRSync(); }
 const gv = id => { const n = $(id); return n ? n.value.trim() : ''; };
 const today = () => new Date().toISOString().slice(0, 10);
@@ -499,6 +543,17 @@ function renderLog() {
   });
 }
 function lrow(label, val) { return val ? `<tr><td>${label}</td><td>${escapeHTML(val)}</td></tr>` : ''; }
+// Photos block for a log entry: thumbnails + add button (uploads via auth.js)
+function entryPhotosHTML(e) {
+  const thumbs = (e.photos || []).map(p => {
+    const src = window.DLRphotos ? DLRphotos.photoUrl(p.k, p.v) : '';
+    return `<button class="photo-thumb" onclick="DLRphotos.viewPhoto('${src}', ${e.id}, '${p.k}')"><img src="${src}" loading="lazy" alt="photo"></button>`;
+  }).join('');
+  return `<h2>Photos</h2>
+    ${thumbs ? `<div class="photo-grid">${thumbs}</div>` : `<p class="hint" style="margin:4px 0 10px">No photos yet — add shots of the kart, setup sheet, or podium.</p>`}
+    <div class="btn-row"><label class="btn ghost photo-add">📷 Add photos
+      <input type="file" accept="image/*" multiple hidden onchange="DLRphotos.uploadEntryPhotos(${e.id}, this)"></label></div>`;
+}
 function openLogEntry(id) {
   const e = loadLog().find(x => x.id === id); if (!e || e.deleted) return;
   const v = $('#view-log-detail');
@@ -527,6 +582,7 @@ function openLogEntry(id) {
           <div class="field"><label>Notes</label><textarea id="as-notes" rows="2" placeholder="how it went"></textarea></div>
           <div class="btn-row"><button class="btn" type="submit">Add session</button></div>
         </form></div>
+      ${entryPhotosHTML(e)}
       <div class="btn-row"><button class="btn danger" onclick="deleteEntry(${e.id})">Delete event</button></div></div>`;
   } else {
     const info = [lrow('Track', e.track), lrow('Date', e.date), lrow('Focus', e.focus),
@@ -538,6 +594,7 @@ function openLogEntry(id) {
       <div class="article"><span class="tag">Training session</span><h1>${escapeHTML(e.track)}</h1>
       <div class="table-wrap"><table>${info}</table></div>
       ${e.notes ? `<p>${escapeHTML(e.notes)}</p>` : ''}
+      ${entryPhotosHTML(e)}
       <div class="btn-row"><button class="btn danger" onclick="deleteEntry(${e.id})">Delete</button></div></div>`;
   }
   showView('view-log-detail');

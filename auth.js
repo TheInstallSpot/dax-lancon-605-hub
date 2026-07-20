@@ -268,17 +268,23 @@
       b.innerHTML = head + d.entries.map(renderEntryRO).join('');
     } catch (e) { const b = $id('dl-body'); if (b) b.innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
   }
+  function entryPhotosRO(e) {
+    if (!e.photos || !e.photos.length) return '';
+    return `<div class="photo-grid">` + e.photos.map((p) =>
+      `<button class="photo-thumb" onclick="DLRphotos.viewPhoto('${photoUrl(p.k, p.v)}')"><img src="${photoUrl(p.k, p.v)}" loading="lazy" alt="photo"></button>`
+    ).join('') + `</div>`;
+  }
   function renderEntryRO(e) {
     if (e.kind === 'event') {
       const days = [e.start, e.end].filter(Boolean).join(' – ');
       const sess = (e.sessions || []).map((s) => `<div class="dl-sess"><b>${esc(s.type || 'Session')}</b> ${esc(s.date || '')}${s.lap ? ' · best ' + esc(s.lap) : ''}${s.result ? ' · ' + esc(s.result) : ''}${s.gear ? ' · gear ' + esc(s.gear) : ''}${s.notes ? '<br><span class="muted">' + esc(s.notes) + '</span>' : ''}</div>`).join('');
       return `<div class="dl-entry"><div class="dl-top">🏁 ${esc(e.name)}<span>${esc(days)}</span></div>
         <div class="muted">${esc(e.track || '')}${e.cls ? ' · ' + esc(e.cls) : ''}${e.driverName ? ' · ' + esc(e.driverName) : ''}</div>
-        ${sess || '<div class="muted">No sessions logged.</div>'}</div>`;
+        ${sess || '<div class="muted">No sessions logged.</div>'}${entryPhotosRO(e)}</div>`;
     }
     const bits = [e.date, e.driver || e.driven ? `gear ${e.driver || '?'}/${e.driven || '?'}` : '', e.lap ? 'best ' + e.lap : '', e.tcold ? 'tires ' + e.tcold : ''].filter(Boolean).map(esc).join(' · ');
     return `<div class="dl-entry"><div class="dl-top">${esc(e.track || 'Session')}</div>
-      <div class="muted">${bits}</div>${e.focus ? '<div>' + esc(e.focus) + '</div>' : ''}${e.notes ? '<div class="muted">' + esc(e.notes) + '</div>' : ''}</div>`;
+      <div class="muted">${bits}</div>${e.focus ? '<div>' + esc(e.focus) + '</div>' : ''}${e.notes ? '<div class="muted">' + esc(e.notes) + '</div>' : ''}${entryPhotosRO(e)}</div>`;
   }
 
   /* ---- system check (smoke test) tab ---- */
@@ -439,6 +445,123 @@
   }
   function logout() { localStorage.removeItem(ADMIN_TOKEN); localStorage.removeItem(OWNER_KEY); if (!getToken()) showGate(); routeAdmin(); }
 
+  /* ---------------- photos ---------------- */
+  const PHOTO_FN = API + '/photos';
+  const photoUrl = (key, v) => `${PHOTO_FN}?get=${encodeURIComponent(key)}&v=${v || 0}`;
+  const slugify = (p) => (p || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  async function shrinkImage(file, maxDim = 1600, quality = 0.82) {
+    // small PNGs (charts/maps) keep their crispness; photos get resized to JPEG
+    if (file.type === 'image/png' && file.size < 1_500_000) {
+      return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    }
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, maxDim / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width * scale), h = Math.round(bmp.height * scale);
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    cv.getContext('2d').drawImage(bmp, 0, 0, w, h);
+    bmp.close && bmp.close();
+    return cv.toDataURL('image/jpeg', quality);
+  }
+
+  async function loadGuideIndex() {
+    try {
+      const d = await api('photos', { action: 'guideIndex' });
+      window.GUIDE_PHOTOS = d.index || {};
+      localStorage.setItem('dlr605_gphotos', JSON.stringify(window.GUIDE_PHOTOS));
+    } catch {
+      try { window.GUIDE_PHOTOS = JSON.parse(localStorage.getItem('dlr605_gphotos') || '{}'); } catch { window.GUIDE_PHOTOS = {}; }
+    }
+  }
+
+  async function uploadEntryPhotos(entryId, input) {
+    const files = [...(input.files || [])];
+    input.value = '';
+    if (!files.length) return;
+    if (!navigator.onLine) { toast('You need a connection to upload photos.'); return; }
+    const t = getToken();
+    if (!t) { toast('Sign in with your code first.'); return; }
+    toast(`Uploading ${files.length} photo${files.length > 1 ? 's' : ''}…`);
+    let done = 0;
+    for (const f of files.slice(0, 12)) {
+      try {
+        const data = await shrinkImage(f);
+        const d = await api('photos', { action: 'upload', token: t, data });
+        const log = window.loadLog(); const e = log.find((x) => x.id === entryId);
+        if (e) {
+          e.photos = e.photos || [];
+          e.photos.push({ k: d.key, v: d.v });
+          e.updatedAt = Date.now();
+          window.saveLog(log);
+        }
+        done++;
+      } catch (err) { toast(err.message || 'Upload failed'); }
+    }
+    if (typeof window.openLogEntry === 'function') window.openLogEntry(entryId);
+    if (done) toast(`${done} photo${done > 1 ? 's' : ''} saved 📸`);
+    DLR.syncNow();
+  }
+
+  async function deleteEntryPhoto(entryId, key) {
+    if (!confirm('Delete this photo?')) return;
+    const t = getAdmin() || getToken();
+    try { await api('photos', { action: 'deletePhoto', token: t, key }); } catch {}
+    const log = window.loadLog(); const e = log.find((x) => x.id === entryId);
+    if (e && e.photos) { e.photos = e.photos.filter((p) => p.k !== key); e.updatedAt = Date.now(); window.saveLog(log); }
+    closeViewer();
+    if (typeof window.openLogEntry === 'function') window.openLogEntry(entryId);
+    DLR.syncNow();
+  }
+
+  async function uploadGuidePhoto(slot, input) {
+    const f = (input.files || [])[0];
+    input.value = '';
+    if (!f) return;
+    if (!navigator.onLine) { toast('You need a connection to upload.'); return; }
+    const t = getAdmin();
+    if (!t) { toast('Open Admin and sign in first.'); openAdmin(); return; }
+    toast('Uploading…');
+    try {
+      const data = await shrinkImage(f, 2000, 0.85);
+      const d = await api('photos', { action: 'guideUpload', token: t, slot, data });
+      window.GUIDE_PHOTOS = window.GUIDE_PHOTOS || {};
+      window.GUIDE_PHOTOS[slot] = { v: d.v };
+      localStorage.setItem('dlr605_gphotos', JSON.stringify(window.GUIDE_PHOTOS));
+      toast('Photo live for the whole team ✔');
+      if (typeof window.rerenderCurrent === 'function') window.rerenderCurrent();
+    } catch (err) { toast(err.message || 'Upload failed'); }
+  }
+
+  async function deleteGuidePhoto(slot) {
+    if (!confirm('Remove this photo? The slot goes back to a placeholder.')) return;
+    const t = getAdmin();
+    if (!t) { openAdmin(); return; }
+    try {
+      await api('photos', { action: 'guideDelete', token: t, slot });
+      if (window.GUIDE_PHOTOS) delete window.GUIDE_PHOTOS[slot];
+      localStorage.setItem('dlr605_gphotos', JSON.stringify(window.GUIDE_PHOTOS || {}));
+      if (typeof window.rerenderCurrent === 'function') window.rerenderCurrent();
+    } catch (err) { toast(err.message || 'Delete failed'); }
+  }
+
+  /* full-screen viewer */
+  function viewPhoto(src, entryId, key) {
+    let ov = $id('photo-viewer');
+    if (!ov) { ov = document.createElement('div'); ov.id = 'photo-viewer'; ov.className = 'pv'; document.body.appendChild(ov); }
+    ov.innerHTML = `<button class="pv-x" onclick="DLRphotos.closeViewer()">✕</button>
+      <img src="${src}" alt="photo">
+      ${entryId ? `<button class="pv-del" onclick="DLRphotos.deleteEntryPhoto(${entryId},'${key}')">Delete photo</button>` : ''}`;
+    ov.classList.add('show');
+    ov.onclick = (e) => { if (e.target === ov) closeViewer(); };
+  }
+  function closeViewer() { const ov = $id('photo-viewer'); if (ov) ov.classList.remove('show'); }
+
+  window.DLRphotos = {
+    photoUrl, slugify, uploadEntryPhotos, deleteEntryPhoto,
+    uploadGuidePhoto, deleteGuidePhoto, viewPhoto, closeViewer,
+    isAdmin: () => !!getAdmin()
+  };
+
   function rel(ts) {
     const s = Math.floor((Date.now() - ts) / 1000);
     if (s < 60) return 'just now';
@@ -458,6 +581,7 @@
     const f = $id('gate-form'); if (f) f.addEventListener('submit', gateLogin);
     const ab = $id('admin-btn'); if (ab) ab.addEventListener('click', openAdmin);
     gateInit();
+    loadGuideIndex();
   });
   window.addEventListener('online', () => DLR.syncNow());
 })();

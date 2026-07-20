@@ -367,6 +367,29 @@ button.code-row:hover{background:var(--glass-hi);transform:translateY(-1px)}
 .store-txt small{font-size:12px;color:var(--muted)}
 .store-go{margin-left:auto;color:var(--accent);font-size:18px;font-weight:800}
 
+/* ---- team photos ---- */
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:10px 0}
+.photo-thumb{position:relative;aspect-ratio:1;border:1px solid var(--glass-line);border-radius:11px;overflow:hidden;
+  background:rgba(8,7,12,.5);padding:0;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+.photo-add{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.photo.live img{cursor:zoom-in}
+.slot-admin{display:flex;gap:8px;padding:8px 10px;border-top:1px solid var(--glass-line);background:rgba(255,255,255,.02)}
+.slot-admin .mini,.slot-upload{cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.slot-upload{margin-top:10px;background:linear-gradient(180deg,#d4ff54,#a9e02f);color:#12140a;border:0;
+  font-weight:800;font-size:12.5px;padding:8px 14px;border-radius:9px;box-shadow:0 4px 14px rgba(198,245,60,.25)}
+/* full-screen viewer */
+.pv{position:fixed;inset:0;z-index:260;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  background:rgba(5,4,9,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:calc(20px + var(--safe-top)) 16px calc(20px + var(--safe))}
+.pv.show{display:flex}
+.pv img{max-width:96vw;max-height:78vh;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,.6)}
+.pv-x{position:absolute;top:calc(14px + var(--safe-top));right:14px;width:38px;height:38px;border-radius:11px;
+  background:rgba(255,255,255,.08);border:1px solid var(--glass-line);color:var(--ink);font-size:16px;cursor:pointer}
+.pv-del{background:rgba(255,90,90,.14);border:1px solid rgba(255,90,90,.35);color:#ff9a9a;
+  font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer}
+
 /* ---- toast ---- */
 .dlr-toast{position:fixed;left:50%;bottom:calc(78px + var(--safe));transform:translate(-50%,20px);z-index:240;
   background:rgba(20,18,28,.96);border:1px solid var(--glass-line);color:var(--ink);
