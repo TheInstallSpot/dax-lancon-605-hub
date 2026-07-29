@@ -47,17 +47,19 @@ img{max-width:100%}
   border-bottom:1px solid rgba(255,255,255,.07);
 }
 .logo{height:28px;width:auto;flex:0 0 auto;display:block;filter:drop-shadow(0 0 10px rgba(198,245,60,.25))}
-.app-title{font-size:15px;font-weight:800;letter-spacing:.4px;margin:0;line-height:1.1}
-.app-sub{font-size:11px;color:var(--muted);margin:2px 0 0}
+.app-header > div{flex:1;min-width:0}
+.app-title{font-size:clamp(12.5px,3.9vw,15px);font-weight:800;letter-spacing:.4px;margin:0;line-height:1.15}
+.app-sub{font-size:11px;color:var(--muted);margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .install-btn{
-  margin-left:auto; display:none; align-items:center; gap:6px;
+  margin-left:auto; display:none; align-items:center; gap:6px; white-space:nowrap; flex:none;
   background:linear-gradient(180deg,#d4ff52,#b9ee2f); color:#12140a; font-weight:800; font-size:13px;
   border:0; border-radius:10px; padding:9px 12px; cursor:pointer; box-shadow:0 4px 14px rgba(198,245,60,.28);
 }
 .install-btn.show{display:inline-flex}
 
 /* ---------- Views ---------- */
-main{max-width:820px; margin:0 auto; padding:16px}
+/* bottom padding clears the fixed tab bar so page-end buttons never slide under it */
+main{max-width:820px; margin:0 auto; padding:16px 16px calc(96px + var(--safe))}
 .view{display:none; animation:fade .28s ease}
 .view.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -305,8 +307,10 @@ body.modal-open{overflow:hidden}
 
 /* ---- code list ---- */
 .code-list{display:flex;flex-direction:column;gap:9px}
-.code-row{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;
+.code-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;
   background:rgba(255,255,255,.035);border:1px solid var(--glass-line);border-radius:12px;padding:12px 13px}
+.cr-main{flex:1 1 200px;min-width:0}
+.cr-actions{margin-left:auto}
 .code-row.dim{opacity:.55}
 button.code-row{cursor:pointer;transition:background .12s,transform .1s}
 button.code-row:hover{background:var(--glass-hi);transform:translateY(-1px)}
