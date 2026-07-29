@@ -2,7 +2,7 @@
    Offline-first caching. Bump CACHE version when you change app files.
    Photos live in a SEPARATE cache (IMG_CACHE) so bumping CACHE for a
    content update does NOT wipe already-downloaded kart photos. */
-const CACHE = 'dlr605-v24';
+const CACHE = 'dlr605-v25';
 const IMG_CACHE = 'dlr605-images-v1';
 const isImage = req =>
   req.destination === 'image' ||
@@ -24,7 +24,8 @@ const ICONS = [
   './icons/icon-maskable-512.png',
   './icons/icon-180.png',
   './icons/favicon-32.png',
-  './brand/mark-605.png'
+  './brand/mark-605.png',
+  './brand/store-logo.png'
 ];
 
 self.addEventListener('install', e => {

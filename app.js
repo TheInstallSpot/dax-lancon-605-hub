@@ -91,8 +91,8 @@ function renderHome() {
   store.target = '_blank'; store.rel = 'noopener';
   store.innerHTML = `
     <span class="store-ic">
-      <img src="https://www.google.com/s2/favicons?domain=overunderracing.com&sz=64" alt=""
-           width="26" height="26" loading="lazy"
+      <img src="./brand/store-logo.png" alt="Over/Under Racing"
+           width="28" height="28" loading="lazy"
            onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M4 9l1.5-5h13L20 9M4 9h16M4 9v11h16V9M9 20v-6h6v6"/></svg>
     </span>
