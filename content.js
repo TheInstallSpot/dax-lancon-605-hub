@@ -1711,5 +1711,47 @@ const TRACKS = [
     ],
     configs: ['Kart circuit (0.76 mi, 14 turns)', 'Paved SuperMoto section (jumps)', 'Dirt Moto section'],
     notes: 'Member facility SW of Fort Worth: a 0.76-mile, 14-turn paved kart circuit with an 800-foot straight and a banked turn, plus SuperMoto and dirt Moto sections.'
+  },
+  {
+    id: 'gcki',
+    name: 'Gulf Coast Kartway (GCKI)',
+    city: 'Katy, TX',
+    address: '29726 Stockdick Rd, Katy, TX 77493',
+    url: 'https://local.aarp.org/place/gulf-coast-kartway-katy-tx.html',
+    map: 'images/tracks/gcki.png',
+    surface: 'Asphalt',
+    layouts: [
+      { name: 'Road course', length: '0.7 mi', turns: null, features: '780′ main straight · run CW or CCW depending on race day' }
+    ],
+    configs: ['Clockwise', 'Counter-clockwise'],
+    notes: 'Home of Gulf Coast Karters (GCKI) west of Houston; hosts TKL rounds 1 and 4 in 2027. Direction changes by race day — check each event notice. GCKI and SpeedSportz members practice free the day before a race.'
+  },
+  {
+    id: 'jax-103rd',
+    name: '103rd Street Sports Complex',
+    city: 'Jacksonville, FL',
+    address: '10271 103rd St, Jacksonville, FL 32210',
+    url: 'https://www.northflkarting.com/',
+    map: 'images/tracks/jax-103rd.png',
+    surface: 'Asphalt',
+    layouts: [
+      { name: 'Full track', length: '—', turns: null, features: 'Banked turns · 1,000′ straight · heavy drafting' }
+    ],
+    configs: ['Full track CW / CCW', 'Full track with chicane', 'NE oval'],
+    notes: 'City of Jacksonville park and home of the North Florida Kart Club (their pages list 10244 103rd St). CKNA Winter Nationals, Jan 1–3 2027 — the track is closed to locals that weekend. Draft-heavy, so gearing and bodywork matter.'
+  },
+  {
+    id: 'omc',
+    name: 'Oklahoma Motorsports Complex',
+    city: 'Norman, OK',
+    address: '3501 S Interstate Dr, Norman, OK 73072',
+    url: 'https://www.oklahomamotorsportscomplex.com/',
+    map: 'images/tracks/omc.png',
+    surface: 'Asphalt',
+    layouts: [
+      { name: 'Kart track', length: '~0.7 mi', turns: null, features: 'Also motocross, pit bike and supermoto tracks' }
+    ],
+    configs: ['Kart sprint circuit'],
+    notes: 'Off I-35 across from Riverwind Casino, about 190 miles north of Dallas. A 2027 DFW Triple Crown venue. Phone (405) 579-2777.'
   }
 ];

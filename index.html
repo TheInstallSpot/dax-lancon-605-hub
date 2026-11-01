@@ -230,6 +230,9 @@
   <!-- ===================== TRACK DETAIL ===================== -->
   <section id="view-track-detail" class="view"></section>
 
+  <!-- ===================== SEASON ===================== -->
+  <section id="view-season" class="view"></section>
+
 </main>
 
 <!-- ===================== BOTTOM NAV ===================== -->
@@ -245,6 +248,10 @@
   <button data-view="view-tracks">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6l6-3 4 3 6-3v15l-6 3-4-3-6 3z"/><path d="M10 3v15M14 6v15"/></svg>
     Tracks
+  </button>
+  <button data-view="view-season">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
+    Season
   </button>
   <button data-view="view-log">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v4M16 3v4M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/></svg>
@@ -274,8 +281,14 @@
   <div class="sheet"><div id="admin-body"></div></div>
 </div>
 
+<!-- ===================== SEASON RACE EDITOR ===================== -->
+<div id="season-sheet" class="overlay hidden">
+  <div class="sheet"><div id="season-sheet-body"></div></div>
+</div>
+
 <script src="./content.js"></script>
 <script src="./app.js"></script>
 <script src="./auth.js"></script>
+<script src="./season.js"></script>
 </body>
 </html>

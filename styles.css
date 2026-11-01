@@ -400,3 +400,59 @@ button.code-row:hover{background:var(--glass-hi);transform:translateY(-1px)}
   padding:11px 18px;border-radius:12px;font-size:13.5px;font-weight:600;box-shadow:0 12px 34px rgba(0,0,0,.5);
   opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:88vw;text-align:center}
 .dlr-toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* =====================================================================
+   SEASON PLANNER (season.js)
+   ===================================================================== */
+.season-status{margin:-6px 2px 12px;font-size:12px}
+.season-status .ss{color:var(--muted)}
+.season-status .ss.ok{color:#bfe86a}
+.season-status .ss.warn{color:#ffcf7a}
+.next-up{display:flex;gap:14px;align-items:center;border-radius:var(--radius);padding:14px 16px;margin:0 0 14px;
+  background:linear-gradient(135deg,rgba(139,92,246,.42),rgba(139,92,246,.14));border:1px solid rgba(183,155,255,.35)}
+.nu-count{text-align:center;min-width:70px;position:relative;z-index:1}
+.nu-count b{display:block;font-size:34px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums;text-shadow:0 0 14px rgba(198,245,60,.35)}
+.nu-count span{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.nu-what{min-width:0;position:relative;z-index:1}
+.nu-what h3{margin:2px 0;font-size:16px;line-height:1.25}
+.nu-what p{margin:0;font-size:13px;color:var(--ink);opacity:.85}
+.chip-row{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.chip-btn{flex:none;background:rgba(255,255,255,.05);border:1px solid var(--glass-line);color:var(--ink);border-radius:999px;
+  padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.chip-btn.on{background:linear-gradient(180deg,#d4ff52,#b9ee2f);color:#12140a;border-color:transparent}
+.season-race{display:grid;grid-template-columns:60px 1fr;background:rgba(255,255,255,.035);border:1px solid var(--glass-line);
+  border-radius:12px;margin:10px 0;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.season-race.going-yes{border-left:3px solid var(--accent)}
+.season-race.going-no{opacity:.55}
+.season-race.past{opacity:.5}
+.sr-date{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:10px 4px;background:rgba(255,255,255,.04);text-align:center}
+.sr-date .m{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sr-date .d{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.sr-date .n{font-size:10.5px;color:var(--muted)}
+.sr-date .tbd{font-size:13px;font-weight:800;color:var(--muted)}
+.sr-body{padding:11px 12px;min-width:0;display:flex;flex-direction:column;gap:5px}
+.sr-top{display:flex;flex-wrap:wrap;align-items:center;gap:7px;font-size:14px}
+.sr-top .muted{font-size:13px}
+.sr-track{font-weight:700;color:var(--ink);text-decoration:none}
+a.sr-track{cursor:pointer;border-bottom:1px dashed rgba(183,155,255,.6)}
+.sr-result{font-size:13px;font-weight:700;color:var(--accent)}
+.sr-body .notes{margin-top:0}
+.sr-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px}
+.sr-by{font-size:11px;color:var(--muted)}
+.kchip{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.kchip.k-lo{background:rgba(139,92,246,.85);color:#fff}
+.kchip.k-sh{background:var(--accent);color:#12140a}
+.kchip.k-mx{border:1px solid var(--muted);color:var(--ink)}
+.going-seg{display:inline-flex;gap:2px;background:rgba(255,255,255,.05);border:1px solid var(--glass-line);border-radius:999px;padding:3px}
+.going-seg button{background:none;border:0;color:var(--muted);font-weight:700;font-size:12.5px;padding:5px 11px;border-radius:999px;cursor:pointer}
+.going-seg button.on.yes{background:var(--accent);color:#12140a}
+.going-seg button.on.no{background:var(--red);color:#fff}
+.going-seg button.on.tbd{background:var(--ink);color:#12140a}
+.check-list{display:flex;flex-direction:column;gap:6px;position:relative;z-index:1}
+.check-row{display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.035);border:1px solid var(--glass-line);border-radius:10px;padding:10px 11px;cursor:pointer}
+.check-row input{width:20px;height:20px;flex:none;margin:1px 0 0;padding:0;accent-color:#c6f53c}
+.check-row span{flex:1;min-width:0;font-size:14px}
+.check-row.done span{color:var(--muted);text-decoration:line-through}
+.check-row .x{background:none;border:0;color:var(--muted);font-size:18px;line-height:1;padding:0 2px;cursor:pointer}
+.add-row{display:flex;gap:8px;margin-top:10px;position:relative;z-index:1}
+.add-row input{flex:1;min-width:0}
