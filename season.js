@@ -134,6 +134,7 @@
           <div class="sr-top"><b>${esc(r.series)}</b>${r.event ? `<span class="muted">${esc(r.event)}</span>` : ''}<span class="kchip ${kartCls(r.kart)}">${esc(r.kart || '—')}</span></div>
           <div>${trk}${r.city ? `<span class="muted"> · ${esc(r.city)}</span>` : ''}</div>
           ${r.result ? `<div class="sr-result">Result: ${esc(r.result)}</div>` : ''}
+          ${r.id === 'r01' ? '<div class="notes">Team arrive-and-drive kart: $3,100 for the weekend. Kart onsite with the team. Estimated weekend for two including travel and a $600 race allowance: $5,370–$6,050 coach, $6,070–$7,050 connecting business, or $6,170–$7,250 domestic First. Confirm which race costs the team package covers.</div>' : ''}
           ${r.notes ? `<div class="notes">${esc(r.notes)}</div>` : ''}
           <div class="sr-actions"><div class="going-seg">${segb('yes', 'Going')}${segb('no', 'Skip')}${segb('tbd', 'TBD')}</div>
             <button class="mini" onclick="DLRseason.edit('${r.id}')">Edit</button></div>
@@ -177,7 +178,7 @@
       <h2>Travel from Dallas</h2>${tbl(['Track', 'Drive (approx.)', 'Plan for'], [
         ['NTK, Denton', '40 mi · ~45 min', 'Day trip'], ['KartMoto, Cresson', '70 mi · ~1 hr 15 min', 'Day trip or stay over'],
         ['OMC, Norman OK', '190 mi · ~3 hr', '1–2 hotel nights'], ['SpeedSportz, New Caney', '230 mi · ~3.5 hr', '2–3 hotel nights'],
-        ['GCKI, Katy', '255 mi · ~4 hr', '2–3 hotel nights'], ['103rd Street, Jacksonville FL', '~1,000 mi · ~15 hr', '2 travel days each way; leave by Dec 30']])}
+        ['GCKI, Katy', '255 mi · ~4 hr', '2–3 hotel nights'], ['103rd Street, Jacksonville FL', '~1,000 mi · ~15 hr', 'Fly Dec 31–Jan 4 or split the drive over two days each way']])}
       <p class="hint">Highway estimates without a trailer; add time for towing and Houston traffic.</p>
       <div class="box note"><b>Memberships:</b> KartMoto is members-only and members pay far less for practice ($25 vs $75 at a 2025 event). NTK 2026 dues: $500, or $350 out of town. GCKI and SpeedSportz members practice free the day before races.</div>
     </div>`;
