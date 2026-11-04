@@ -9,6 +9,7 @@ race-day calculators, and an on-device track/setup log. Tailored to our
 - **Tools:** Gear Ratio · Gear Change compare-&-chart · Speed & RPM · Weight & Ballast
 - **Tracks:** Layout & info pages for our home tracks (SpeedSportz, NOLA, Dallas Karting Complex, NTK, Amarillo, Kart Moto) — accurate GPS-traced outlines (© OpenStreetMap, ODbL) + official-map slots; feeds the Log track picker
 - **Log:** Multi-day **Events** (with per-session results across the weekend) and **Training sessions**, track picker, tap-to-recall, CSV export — all on-device
+- **Season:** the 2027 race schedule shared by the whole team — countdown to the next race, Going / Skip / TBD per race, dates, results and notes, a team checklist (season to-dos + race-weekend packing list), and series info (registration, kart number rules, drive times). Saved on the phone first so it works offline, then synced to everyone signed in with a code (or the admin) through `netlify/functions/season.js` (Netlify Blobs key `season_2027`). Edits merge per item; newest change wins.
 
 ## Files
 ```

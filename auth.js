@@ -79,6 +79,7 @@
       hideGate();
       toast('Welcome' + (d.name ? ', ' + d.name.split(/[–-]/)[0].trim() : '') + ' 🏁');
       DLR.syncNow();
+      if (window.DLRseason) window.DLRseason.sync();
     } catch (e) {
       msg.textContent = e.message || 'That code isn’t valid.';
       if (inp.select) inp.select();
@@ -102,7 +103,7 @@
   /* ---------------- admin ---------------- */
   function openAdmin() { const o = $id('admin'); if (o) { o.classList.remove('hidden'); document.body.classList.add('modal-open'); routeAdmin(); } }
   function closeAdmin() { const o = $id('admin'); if (o) o.classList.add('hidden'); document.body.classList.remove('modal-open'); }
-  function ownerEnter() { localStorage.setItem(OWNER_KEY, '1'); closeAdmin(); hideGate(); toast('Welcome, Lee 🏁'); }
+  function ownerEnter() { localStorage.setItem(OWNER_KEY, '1'); closeAdmin(); hideGate(); toast('Welcome, Lee 🏁'); if (window.DLRseason) window.DLRseason.sync(); }
   function adminBody() { return $id('admin-body'); }
 
   async function adminApi(action, extra) {
@@ -367,6 +368,13 @@
       const d = await api('logsync', { action: 'sync', token: smoke.token, entries: [entry] });
       if (!(d.entries || []).some((x) => x.track === '⚙ SMOKE TEST')) throw new Error('test entry did not round-trip');
       return { detail: 'entry synced up & back' };
+    });
+    await step('Season planner sync', async () => {
+      if (!smoke.token) throw new Error('skipped — no token');
+      const d = await api('season', { action: 'get', token: smoke.token });
+      const n = (d.races || []).filter((r) => !r.deleted).length;
+      if (!Array.isArray(d.races)) throw new Error('no season data returned');
+      return { detail: `${n} races on the team schedule` };
     });
     await step('Admin can read the driver log', async () => {
       if (!smoke.cid) throw new Error('skipped — no test code');
